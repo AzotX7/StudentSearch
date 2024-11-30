@@ -1,0 +1,49 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #444;
+    color: white;
+    padding: 10px 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.material, .user {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+h2 {
+    margin-top: 20px;
+}
+
+form {
+    margin-top: 20px;
+}
+
+main input[type="submit"] {
+    padding: 10px 15px; /* Увеличиваем внутренние отступы */
+    border-radius: 5px; /* Закругление углов */
+    color: #fff; /* Цвет текста */
+    background-color: #444 !important; /* Темный цвет фона кнопки */
+    font-size: 16px; /* Размер шрифта */
+    cursor: pointer; /* Указатель при наведении */
+    border: none; /* Убираем границу */
+    height: 40px; /* Фиксированная высота */
+    width: 100%; /* Ширина кнопки на всю ширину формы */
+    transition: background-color 0.3s; /* Плавный переход фона */
+    margin-top: 10px; /* Отступ сверху для кнопки */
+    box-sizing: border-box; /* Учитываем padding и border в ширину */
+}
+
+main input[type="submit"]:hover {
+    background-color: #666 !important; /* Цвет кнопки при наведении */
+}
