@@ -1,9 +1,8 @@
 package com.azot.course.servlets;
 
-import com.azot.course.DAO.MaterialDAO;
-import com.azot.course.DAO.UserDAO;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.DAOImpl.UserDAOImpl;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.User;
 import com.azot.course.util.Database;
 
 import javax.servlet.ServletException;
@@ -14,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/users/search")
@@ -22,11 +22,18 @@ public class SearchUsersServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String query = request.getParameter("query");
-        List<User> users;
+        List<UserDTO> userDTOs = new ArrayList<>();
+
 
         try (Connection connection = Database.getConnection()) {
-            UserDAO userDAO = new UserDAO(connection);
-            users = userDAO.searchUsers(query);
+            UserDAOImpl userDAO = new UserDAOImpl(connection);
+            List<User> users = userDAO.searchUsers(query);
+
+            for (User user : users) {
+                UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+                userDTOs.add(userDTO);
+            }
+
         } catch (SQLException e) {
 
             request.setAttribute("errorMessage", "Ошибка при выполнении поиска: " + e.getMessage());
@@ -35,9 +42,9 @@ public class SearchUsersServlet extends HttpServlet {
             return;
         }
 
-        request.setAttribute("users", users);
+        request.setAttribute("users", userDTOs);
 
-        if (users.isEmpty()) {
+        if (userDTOs.isEmpty()) {
             request.setAttribute("noResultsMessage", "Пользователи не найдены.");
         }
 

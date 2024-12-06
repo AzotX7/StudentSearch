@@ -1,9 +1,11 @@
 package com.azot.course.servlets;
 
-import com.azot.course.DAO.MaterialDAO;
-import com.azot.course.DAO.UserDAO;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.DAOImpl.MaterialDAOImpl;
+import com.azot.course.DAO.DAOImpl.UserDAOImpl;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.Material;
+import com.azot.course.models.User;
+import com.azot.course.service.UserService;
 import com.azot.course.util.Database;
 
 import javax.servlet.ServletException;
@@ -22,26 +24,26 @@ public class ProfileServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getPathInfo();
-        User user = (User) request.getSession().getAttribute("user");
+        UserDTO userDTO = (UserDTO) request.getSession().getAttribute("user");
 
-        if (user == null) {
+        if (userDTO == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
 
         try {
             if (action == null || "/".equals(action)) {
-                Connection connection = Database.getConnection();
-                MaterialDAO materialDAO = new MaterialDAO(connection);
+                User user = new UserService(Database.getConnection()).getFullUserByUsername(userDTO.getUsername());
 
-                request.setAttribute("user", user);
+                MaterialDAOImpl materialDAO = new MaterialDAOImpl(Database.getConnection());
+                request.setAttribute("user", userDTO);
                 List<Material> userMaterials = materialDAO.getMaterialsByUserId(user.getId());
                 request.setAttribute("materials", userMaterials);
+
                 request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
 
             } else if ("/edit".equals(action)) {
-
-                request.setAttribute("user", user);
+                request.setAttribute("user", userDTO);
                 request.getRequestDispatcher("/WEB-INF/views/editProfile.jsp").forward(request, response);
 
             } else {
@@ -57,25 +59,36 @@ public class ProfileServlet extends HttpServlet {
         String action = request.getPathInfo();
 
         if ("/update".equals(action)) {
+            UserDTO userDTO = (UserDTO) request.getSession().getAttribute("user");
 
-            User user = (User) request.getSession().getAttribute("user");
-            if (user != null) {
-
+            if (userDTO != null) {
                 String username = request.getParameter("username");
                 String email = request.getParameter("email");
 
-
                 if (username != null && !username.trim().isEmpty() && email != null && !email.trim().isEmpty()) {
-
                     try {
                         Connection connection = Database.getConnection();
-                        UserDAO userDAO = new UserDAO(connection);
+                        UserDAOImpl userDAO = new UserDAOImpl(connection);
 
+                        if (!userDTO.getUsername().equals(username) && userDAO.userExistsByUsername(username)) {
+                            request.setAttribute("errorMessage", "Имя пользователя уже существует.");
+                            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+                            return;
+                        }
+                        if (!userDTO.getEmail().equals(email) && userDAO.userExistsByEmail(email)) {
+                            request.setAttribute("errorMessage", "Email уже существует.");
+                            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+                            return;
+                        }
 
-                        user.setUsername(username);
-                        user.setEmail(email);
-                        userDAO.updateUser(user);
-                        request.getSession().setAttribute("user", user);
+                        User updatedUser = userDAO.getUserById(userDTO.getId());
+                        updatedUser.setUsername(username);
+                        updatedUser.setEmail(email);
+                        userDAO.updateUser(updatedUser);
+
+                        userDTO.setUsername(username);
+                        userDTO.setEmail(email);
+                        request.getSession().setAttribute("user", userDTO);
 
                         response.sendRedirect(request.getContextPath() + "/profile");
                     } catch (SQLException e) {

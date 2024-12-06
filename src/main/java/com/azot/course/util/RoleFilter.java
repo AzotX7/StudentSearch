@@ -1,7 +1,7 @@
 package com.azot.course.util;
 
-import com.azot.course.data.Role;
-import com.azot.course.entity.User;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.user.Role;
 
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
@@ -14,7 +14,6 @@ import java.io.IOException;
 public class RoleFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-
     }
 
     @Override
@@ -24,24 +23,20 @@ public class RoleFilter implements Filter {
 
         String path = httpRequest.getRequestURI();
         HttpSession session = httpRequest.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        UserDTO userDTO = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
         if (path.contains("/login") || path.contains("/register") || path.contains("/logout") || path.equals(httpRequest.getContextPath() + "/")) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }
 
-
-        if (user != null) {
-            Role role = user.getRole();
-
+        if (userDTO != null) {
+            Role role = userDTO.getRole();
 
             if (role == Role.ADMIN) {
                 filterChain.doFilter(servletRequest, httpResponse);
                 return;
-            }
-
-            else if (role == Role.USER) {
+            } else if (role == Role.USER) {
                 if (path.contains("/materials") || path.contains("/comments") || path.contains("/profile") || path.contains("/myMaterials")) {
                     filterChain.doFilter(servletRequest, httpResponse);
                     return;
@@ -52,17 +47,14 @@ public class RoleFilter implements Filter {
             }
         }
 
-
-        if (user == null && !path.contains("/login")) {
+        if (userDTO == null && !path.contains("/login")) {
             httpResponse.sendRedirect(httpRequest.getContextPath() + "/login");
         } else {
             filterChain.doFilter(servletRequest, httpResponse);
         }
     }
 
-
     @Override
     public void destroy() {
     }
 }
-

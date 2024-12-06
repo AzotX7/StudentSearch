@@ -7,7 +7,7 @@
     <title>${material.title}</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        /* Общий стиль страницы */
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,7 +16,7 @@
             color: #fff;
         }
 
-        /* Верхняя панель */
+
         header {
             background: #1a1a1a;
             color: white;
@@ -34,7 +34,7 @@
             margin: 0;
         }
 
-        /* Кнопка для возвращения ко всем материалам */
+
         .back-button {
             padding: 10px 15px;
             border-radius: 5px;
@@ -105,13 +105,13 @@
         }
 
         .comment-delete-btn {
-            margin-top: 10px; /* Отступ сверху */
-            background-color: #ff4444; /* Красный цвет для кнопки удаления */
+            margin-top: 10px;
+            background-color: #ff4444;
             color: #fff;
             padding: 5px 10px;
             font-size: 12px;
             border: none;
-            border-radius: 3px; /* Добавлен радиус для скругления углов */
+            border-radius: 3px;
             cursor: pointer;
             transition: background-color 0.3s;
             display: inline-block;
@@ -121,7 +121,7 @@
             background-color: #ff6666;
         }
 
-        /* Форма добавления комментария */
+
         .add-comment-form {
             display: flex;
             flex-direction: column;
@@ -135,14 +135,14 @@
         }
 
         .add-comment-form textarea {
-            width: 100%; /* Ширина текстового поля */
+            width: 100%;
             padding: 10px;
             background-color: #333;
             border: 1px solid #444;
             border-radius: 5px;
             color: #e0e0e0;
-            resize: none; /* Запрет на изменение размера */
-            min-height: 100px; /* Увеличена минимальная высота */
+            resize: none;
+            min-height: 100px;
             font-size: 18px;
         }
 
@@ -159,7 +159,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s;
-            outline: none; /* Удаление контуров при нажатии */
+            outline: none;
         }
 
         .add-comment-form button:hover {
@@ -204,7 +204,7 @@
         }
 
         .admin-actions .delete-btn button {
-            background-color: #444; /* Цвет для кнопки удаления */
+            background-color: #444;
             border: none;
             color: #fff;
             padding: 10px 15px;
@@ -215,7 +215,7 @@
         }
 
         .admin-actions .delete-btn button:hover {
-            background-color: #666; /* Темнее при наведении */
+            background-color: #666;
         }
     </style>
 </head>
@@ -252,7 +252,7 @@
         <h2>Комментарии</h2>
         <c:forEach var="comment" items="${comments}">
             <div class="comment">
-                <div class="comment-author">${comment.author.username}</div>
+                <div class="comment-author">${comment.username}</div>
                 <div class="comment-date">${comment.createdAt}</div>
                 <div class="comment-text">${comment.text}</div>
                 <c:if test="${user.role == 'ADMIN'}">

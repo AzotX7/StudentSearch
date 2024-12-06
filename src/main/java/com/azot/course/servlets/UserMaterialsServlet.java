@@ -1,8 +1,9 @@
 package com.azot.course.servlets;
 
-import com.azot.course.DAO.MaterialDAO;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.DAOImpl.MaterialDAOImpl;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.Material;
+import com.azot.course.models.User;
 import com.azot.course.util.Database;
 
 import javax.servlet.ServletException;
@@ -19,7 +20,7 @@ public class UserMaterialsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        User user = (User) request.getSession().getAttribute("user");
+        UserDTO user = (UserDTO) request.getSession().getAttribute("user");
 
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
@@ -28,7 +29,7 @@ public class UserMaterialsServlet extends HttpServlet {
 
         try {
             Connection connection = Database.getConnection();
-            MaterialDAO materialDAO = new MaterialDAO(connection);
+            MaterialDAOImpl materialDAO = new MaterialDAOImpl(connection);
             List<Material> userMaterials = materialDAO.getMaterialsByUserId(user.getId());
             request.setAttribute("materials", userMaterials);
 

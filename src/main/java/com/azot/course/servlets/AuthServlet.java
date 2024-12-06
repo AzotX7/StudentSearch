@@ -1,6 +1,6 @@
-package com.azot.course.controller;
+package com.azot.course.servlets;
 
-import com.azot.course.data.Role;
+import com.azot.course.user.Role;
 
 import com.azot.course.service.UserService;
 import com.azot.course.util.Database;
@@ -16,10 +16,10 @@ import java.sql.SQLException;
 
 
 @WebServlet("/register")
-public class AuthController extends HttpServlet {
+public class AuthServlet extends HttpServlet {
     private final UserService userService;
 
-    public AuthController() throws SQLException {
+    public AuthServlet() throws SQLException {
         this.userService = new UserService(Database.getConnection());
     }
 

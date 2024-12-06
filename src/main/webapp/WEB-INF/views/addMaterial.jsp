@@ -138,7 +138,14 @@
         <label for="imageUrl">URL изображения:</label>
         <input type="text" id="imageUrl" name="imageUrl" required>
 
-        <input type="submit" value="Добавить материал"> <!-- Кнопка с нужными стилями -->
+        <label>Категории:</label>
+        <c:forEach var="category" items="${categories}">
+            <div>
+                <input type="checkbox" id="category_${category.id}" name="categories" value="${category.id}">
+                <label for="category_${category.id}">${category.name}</label>
+            </div>
+        </c:forEach>
+        <input type="submit" value="Добавить материал">
     </form>
 </main>
 </body>

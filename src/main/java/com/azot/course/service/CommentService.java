@@ -1,38 +1,41 @@
 package com.azot.course.service;
 
 import com.azot.course.DAO.CommentDAO;
-import com.azot.course.entity.Comment;
+import com.azot.course.DAO.DAOImpl.CommentDAOImpl;
+import com.azot.course.DTO.CommentDTO;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.Comment;
+import com.azot.course.models.Material;
+import com.azot.course.models.User;
 import lombok.SneakyThrows;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommentService {
-    private final CommentDAO commentDAO;
+    private final CommentDAOImpl commentDAO;
 
 
-    public CommentService(Connection connection) {
-        this.commentDAO = new CommentDAO(connection);
+    public CommentService(Connection connection)     {
+        this.commentDAO = new CommentDAOImpl(connection);
     }
 
     @SneakyThrows
-    public void addComment(int materialId,Comment comment){
+    public void addComment(int materialId,CommentDTO commentDTO){
+        Comment comment = fromDTO(commentDTO,materialId);
         commentDAO.addComment(materialId,comment);
     }
 
     @SneakyThrows
-    public Comment getCommentById(int id) {
-        return commentDAO.getCommentById(id);
+    public CommentDTO getCommentById(int id) {
+        Comment comment = commentDAO.getCommentById(id);
+        return toDTO(comment);
     }
 
     @SneakyThrows
-    public List<Comment> getAllComments(){
-        return commentDAO.getAllComments();
-    }
-
-    @SneakyThrows
-    public void updateComment(Comment comment) {
-        commentDAO.updateComment(comment);
+    public List<CommentDTO> getAllComments(){
+        return commentDAO.getAllComments().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     @SneakyThrows
@@ -40,7 +43,37 @@ public class CommentService {
         commentDAO.deleteComment(id);
     }
     @SneakyThrows
-    public List<Comment> getCommentsByMaterialId(int materialId){
-        return commentDAO.findCommentsByMaterialId(materialId);
+    public List<CommentDTO> getCommentsByMaterialId(int materialId){
+        return commentDAO.findCommentsByMaterialId(materialId).stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    private CommentDTO toDTO(Comment comment) {
+        return new CommentDTO(
+                comment.getId(),
+                comment.getText(),
+                comment.getCreatedAt(),
+                comment.getAuthor().getUsername(),
+                comment.getAuthor().getId()
+        );
+    }
+
+    private Comment fromDTO(CommentDTO commentDTO,int materialId) {
+        Comment comment = new Comment();
+        comment.setId(commentDTO.getId());
+        comment.setText(commentDTO.getText());
+        comment.setCreatedAt(commentDTO.getCreatedAt());
+
+        User user = new User();
+        user.setId(commentDTO.getAuthorId());
+        user.setUsername(commentDTO.getUsername());
+        comment.setAuthor(user);
+
+        Material material = new Material();
+        material.setId(materialId);
+        comment.setMaterial(material);
+
+
+
+        return comment;
     }
 }

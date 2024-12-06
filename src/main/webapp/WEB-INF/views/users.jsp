@@ -114,6 +114,7 @@
     <div class="logo">StudentSearchAdmin</div>
     <nav>
         <a href="${pageContext.request.contextPath}/materials">Материалы</a>
+        <a href="${pageContext.request.contextPath}/categories" class="btn-large">Категории</a>
         <a href="${pageContext.request.contextPath}/users/addUser" class="btn-large">Добавить пользователя</a>
         <a href="${pageContext.request.contextPath}/logout">Выход</a>
     </nav>

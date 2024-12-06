@@ -1,4 +1,4 @@
-package com.azot.course.data;
+package com.azot.course.user;
 
 public enum Role {
     ADMIN,

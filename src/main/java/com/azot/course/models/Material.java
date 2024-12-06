@@ -1,4 +1,4 @@
-package com.azot.course.entity;
+package com.azot.course.models;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,5 +20,5 @@ public class Material {
 
     private List<Comment> comments;
 
-    private List<Group> groups;
+    private List<Category> categories;
 }
