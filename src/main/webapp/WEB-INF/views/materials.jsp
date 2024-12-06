@@ -52,22 +52,33 @@
             border-color: #444;
         }
 
-        /* Стили для поля поиска */
-        nav input[type="text"] {
-            padding: 5px; /* Уменьшен внутренний отступ */
-            border-radius: 5px;
-            border: 1px solid #333;
-            font-size: 14px; /* Уменьшен размер шрифта */
-            width: 180px; /* Уменьшена ширина */
-            color: #ffffff;
-            background-color: #222;
-            margin-right: 15px; /* Уменьшен отступ справа */
-            height: 22px; /* Уменьшена высота */
-            margin-left: -20px;
+        .search-container {
+            position: relative;
+            display: inline-block;
+            margin-right: 15px;
         }
 
-        nav input[type="text"]::placeholder {
-            color: #ffffff; /* Цвет текста внутри поисковика */
+        .search-container input[type="text"] {
+            padding: 10px 30px 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+            font-size: 16px;
+            width: 200px;
+            color: #ffffff;
+            background-color: #222;
+            height: 25px;
+        }
+
+        .search-container input[type="text"]::placeholder {
+            color: #ffffff;
+        }
+
+        .filter-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
         }
 
         /* Центральное название */
@@ -147,15 +158,15 @@
         }
 
         .btn:hover {
-            background-color: #666; /* Цвет фона при наведении */
+            background-color: #666;
         }
 
-        /* Убираем стандартные стили для кнопок submit */
+
         form input[type="submit"] {
             display: none;
         }
 
-        /* Стили для полей ввода */
+
         form input[type="text"], form textarea {
             width: 100%;
             margin-bottom: 10px;
@@ -166,9 +177,57 @@
             color: #ffffff;
         }
 
-        /* Убираем отступы у форм */
         .delete-btn {
-            margin: 0; /* Убедимся, что у формы нет отступов */
+            margin: 0;
+        }
+        .filter-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .filter-modal-content {
+            background-color: #1a1a1a;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .filter-modal-content h2 {
+            margin-top: 0;
+        }
+
+        .filter-modal-content label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .filter-modal-content input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -176,15 +235,18 @@
 <header>
     <div class="logo">StudentSearch</div>
     <nav>
+    <div class="search-container">
         <form action="${pageContext.request.contextPath}/materials/search" method="get" style="display:inline;">
             <input type="text" name="query" placeholder="Найти материал...">
+            <span class="filter-icon" onclick="openFilterModal()">🔍</span>
         </form>
+    </div>
+
 
         <c:if test="${user.role == 'ADMIN' || user.role == 'USER'}">
             <a href="${pageContext.request.contextPath}/materials/add" class="add-material-btn">Добавить материал</a>
         </c:if>
 
-        <!-- Кнопка для администратора, чтобы перейти ко всем пользователям -->
         <c:if test="${user.role == 'ADMIN'}">
             <a href="${pageContext.request.contextPath}/users" class="view-users-btn">Все пользователи</a>
         </c:if>
@@ -224,5 +286,37 @@
         </c:otherwise>
     </c:choose>
 </main>
+<div id="filterModal" class="filter-modal">
+    <div class="filter-modal-content">
+        <span class="close" onclick="closeFilterModal()">&times;</span>
+        <h2>Фильтр по категориям</h2>
+        <form action="${pageContext.request.contextPath}/materials/search" method="get">
+            <c:forEach var="category" items="${categories}">
+                <label>
+                    <input type="checkbox" name="categories" value="${category.id}">
+                    ${category.name}
+                </label>
+            </c:forEach>
+            <input type="submit" value="Применить фильтр">
+        </form>
+    </div>
+</div>
+
+<script>
+    function openFilterModal() {
+        document.getElementById('filterModal').style.display = 'block';
+    }
+
+    function closeFilterModal() {
+        document.getElementById('filterModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        var modal = document.getElementById('filterModal');
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>

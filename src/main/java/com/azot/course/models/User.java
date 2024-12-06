@@ -1,6 +1,6 @@
-package com.azot.course.entity;
+package com.azot.course.models;
 
-import com.azot.course.data.Role;
+import com.azot.course.user.Role;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.List;
@@ -26,8 +26,6 @@ public class User {
     private Role role;
 
     private List<Material> materials;
-
-    private List<Group> groups;
 
     private List<Comment> comments;
 }

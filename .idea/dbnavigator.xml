@@ -21,6 +21,12 @@
 FROM materials;
 
 select *
+from material_categories
+
+select *
+from categories
+
+select *
 from users;
 
 SELECT * FROM materials WHERE author_id = 15;

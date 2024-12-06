@@ -54,7 +54,7 @@
             font-size: 18px;
             margin-bottom: 20px;
             padding: 15px;
-            background: #222; /* Цвет фона для блока информации профиля */
+            background: #222;
             border-radius: 8px;
         }
         .profile-info p {

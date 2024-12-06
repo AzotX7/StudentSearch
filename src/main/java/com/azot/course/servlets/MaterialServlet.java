@@ -1,13 +1,19 @@
-package com.azot.course.controller;
+package com.azot.course.servlets;
 
-import com.azot.course.data.Role;
-import com.azot.course.entity.Comment;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.CategoryDAO;
+import com.azot.course.DAO.MaterialDAO;
+import com.azot.course.DTO.CommentDTO;
+import com.azot.course.DTO.MaterialDTO;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.Category;
+import com.azot.course.service.CategoryService;
+import com.azot.course.user.Role;
+import com.azot.course.models.Comment;
+import com.azot.course.models.Material;
+import com.azot.course.models.User;
 import com.azot.course.service.CommentService;
 import com.azot.course.service.MaterialService;
 import com.azot.course.util.Database;
-import lombok.SneakyThrows;
 
 import javax.servlet.annotation.WebServlet;
 
@@ -16,25 +22,28 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 @WebServlet("/materials/*")
-public class MaterialController extends HttpServlet {
+public class MaterialServlet extends HttpServlet {
     private MaterialService materialService;
     private CommentService commentService;
 
-    public MaterialController(MaterialService materialService,CommentService commentService) {
+    private CategoryService categoryService;
+
+    public MaterialServlet(MaterialService materialService, CommentService commentService, CategoryService categoryService) {
         this.materialService = materialService;
         this.commentService = commentService;
-
+        this.categoryService = categoryService;
     }
 
-    public MaterialController() throws SQLException {
+    public MaterialServlet() throws SQLException {
         this.materialService = new MaterialService(Database.getConnection());
         this.commentService = new CommentService(Database.getConnection());
+        this.categoryService = new CategoryService(Database.getConnection());
     }
 
     @Override
@@ -43,23 +52,25 @@ public class MaterialController extends HttpServlet {
         try {
             if (action == null || "/".equals(action)) {
 
-                List<Material> materials = materialService.getAllMaterials();
+                List<MaterialDTO> materials = materialService.getAllMaterials();
                 request.setAttribute("materials", materials);
                 request.getRequestDispatcher("/WEB-INF/views/materials.jsp").forward(request, response);
 
             } else if ("/add".equals(action)) {
+                List<Category> categories = categoryService.getAllCategories();
+                request.setAttribute("categories", categories);
                 request.getRequestDispatcher("/WEB-INF/views/addMaterial.jsp").forward(request, response);
 
             }else if ("/edit".equals(action)) {
 
-                User user = (User) request.getSession().getAttribute("user");
+                UserDTO user = (UserDTO) request.getSession().getAttribute("user");
                 if (user == null || user.getRole() != Role.ADMIN) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
                     return;
                 }
 
                 int materialId = Integer.parseInt(request.getParameter("materialId"));
-                Material material = materialService.getMaterialById(materialId);
+                MaterialDTO material = materialService.getMaterialById(materialId);
                 if (material != null) {
                     request.setAttribute("material", material);
                     request.getRequestDispatcher("/WEB-INF/views/editMaterial.jsp").forward(request, response);
@@ -69,10 +80,10 @@ public class MaterialController extends HttpServlet {
             } else if ("/view".equals(action)) {
 
                 int materialId = Integer.parseInt(request.getParameter("materialId"));
-                Material material = materialService.getMaterialById(materialId);
+                MaterialDTO material = materialService.getMaterialById(materialId);
                 if (material != null) {
                     request.setAttribute("material", material);
-                    List<Comment> comments = commentService.getCommentsByMaterialId(materialId);
+                    List<CommentDTO> comments = commentService.getCommentsByMaterialId(materialId);
                     request.setAttribute("comments", comments);
 
                     request.getRequestDispatcher("/WEB-INF/views/viewMaterial.jsp").forward(request, response);
@@ -81,7 +92,7 @@ public class MaterialController extends HttpServlet {
                 }
             }else if ("/profile".equals(action)) {
 
-                User user = (User) request.getSession().getAttribute("user");
+                UserDTO user = (UserDTO) request.getSession().getAttribute("user");
                 if (user != null) {
                     request.setAttribute("user", user);
                     request.getRequestDispatcher("/WEB-INF/views/profile.jsp").forward(request, response);
@@ -98,7 +109,7 @@ public class MaterialController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getPathInfo();
-        User user = (User) request.getSession().getAttribute("user");
+        UserDTO user = (UserDTO) request.getSession().getAttribute("user");
 
 
         if (user == null) {
@@ -111,7 +122,7 @@ public class MaterialController extends HttpServlet {
                 String title = request.getParameter("title");
                 String content = request.getParameter("content");
                 String imageUrl = request.getParameter("imageUrl");
-
+                String[] categoryIds = request.getParameterValues("categories");
 
                 if (title == null || content == null) {
                     request.setAttribute("errorMessage", "Заголовок или содержание не могут быть пустыми.");
@@ -119,12 +130,23 @@ public class MaterialController extends HttpServlet {
                     return;
                 }
 
-                Material material = new Material();
+                List<Category> categories = new ArrayList<>();
+                if (categoryIds != null) {
+                    for (String categoryId : categoryIds) {
+                        Category category = categoryService.getCategoryById(Integer.parseInt(categoryId));
+                        categories.add(category);
+                    }
+                }
+
+
+                MaterialDTO material = new MaterialDTO();
                 material.setTitle(title);
                 material.setContent(content);
                 material.setCreatedAt(new Date());
                 material.setImageURL(imageUrl);
-                material.setAuthor(user);
+                material.setAuthorId(user.getId());
+                material.setCategories(categories);
+
                 materialService.addMaterial(material);
 
                 response.sendRedirect(request.getContextPath() + "/materials");
@@ -135,11 +157,11 @@ public class MaterialController extends HttpServlet {
                 String content = request.getParameter("content");
                 String imageUrl = request.getParameter("imageUrl");
 
-                Material material = materialService.getMaterialById(materialId);
+                MaterialDTO material = materialService.getMaterialById(materialId);
                 if (material != null) {
                     material.setTitle(title);
                     material.setContent(content);
-                    material.setAuthor(user);
+                    material.setAuthorId(user.getId());
                     material.setImageURL(imageUrl);
                     materialService.updateMaterial(material);
                     response.sendRedirect(request.getContextPath() + "/materials");

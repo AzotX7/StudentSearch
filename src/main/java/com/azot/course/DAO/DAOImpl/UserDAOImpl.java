@@ -1,19 +1,19 @@
-package com.azot.course.DAO;
+package com.azot.course.DAO.DAOImpl;
 
-import com.azot.course.data.Role;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.UserDAO;
+import com.azot.course.user.Role;
+import com.azot.course.models.User;
 
 import java.sql.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO {
+public class UserDAOImpl implements UserDAO {
 
     private final Connection connection;
 
-    public UserDAO(Connection connection) {
+    public UserDAOImpl(Connection connection) {
         this.connection = connection;
     }
 
@@ -56,7 +56,7 @@ public class UserDAO {
         String sql = "DELETE FROM Users WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate(); // Получаем количество затронутых строк
+            int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
                 throw new SQLException("User with ID " + id + " does not exist.");
             }
@@ -105,6 +105,29 @@ public class UserDAO {
         return users;
     }
 
+    public boolean userExistsByUsername(String username) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Users WHERE username = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
+
+    public boolean userExistsByEmail(String email) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        }
+        return false;
+    }
 
     private User mapRowToUser(ResultSet resultSet) throws SQLException {
         User user = new User();
@@ -117,6 +140,4 @@ public class UserDAO {
         user.setSalt(resultSet.getString("salt"));
         return user;
     }
-
-
 }

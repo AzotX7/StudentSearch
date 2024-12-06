@@ -1,8 +1,11 @@
-package com.azot.course.controller;
+package com.azot.course.servlets;
 
-import com.azot.course.entity.Comment;
-import com.azot.course.entity.Material;
-import com.azot.course.entity.User;
+import com.azot.course.DAO.CommentDAO;
+import com.azot.course.DTO.CommentDTO;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.models.Comment;
+import com.azot.course.models.Material;
+import com.azot.course.models.User;
 import com.azot.course.service.CommentService;
 import com.azot.course.util.Database;
 import lombok.SneakyThrows;
@@ -14,21 +17,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
 @WebServlet("/comments")
-public class CommentController extends HttpServlet {
+public class CommentServlet extends HttpServlet {
 
     private final CommentService commentService;
 
-    public CommentController(CommentService commentService) {
+    public CommentServlet(CommentService commentService) {
         this.commentService = commentService;
     }
 
     @SneakyThrows
-    public CommentController() {
+    public CommentServlet() {
         this.commentService = new CommentService(Database.getConnection());
     }
 
@@ -36,7 +38,7 @@ public class CommentController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int materialId = Integer.parseInt(request.getParameter("materialId"));
         try {
-            List<Comment> comments = commentService.getCommentsByMaterialId(materialId);
+            List<CommentDTO> comments = commentService.getCommentsByMaterialId(materialId);
             request.setAttribute("comments", comments);
             request.getRequestDispatcher("/WEB-INF/views/viewMaterial.jsp").forward(request, response);
         } catch (Exception e) {
@@ -76,7 +78,7 @@ public class CommentController extends HttpServlet {
         }
 
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+        UserDTO user = (UserDTO) session.getAttribute("user");
 
         if (user == null) {
             request.setAttribute("errorMessage", "Пользователь не авторизован");
@@ -91,13 +93,12 @@ public class CommentController extends HttpServlet {
             return;
         }
 
-        Comment comment = new Comment();
+        CommentDTO comment = new CommentDTO();
         comment.setText(commentText);
         comment.setCreatedAt(new Date());
-        comment.setAuthor(user);
-        Material material = new Material();
-        material.setId(materialId);
-        comment.setMaterial(material);
+        comment.setUsername(user.getUsername());
+        comment.setAuthorId(user.getId());
+
 
         try {
             commentService.addComment(materialId, comment);

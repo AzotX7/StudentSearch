@@ -1,7 +1,8 @@
-package com.azot.course.controller;
+package com.azot.course.servlets;
 
-import com.azot.course.data.Role;
-import com.azot.course.entity.User;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.user.Role;
+import com.azot.course.models.User;
 import com.azot.course.service.UserService;
 import com.azot.course.util.Database;
 import lombok.SneakyThrows;
@@ -18,51 +19,46 @@ import java.io.IOException;
 
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @WebServlet("/users/*")
-public class UserController extends HttpServlet {
+public class UserServlet extends HttpServlet {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserServlet(UserService userService) {
         this.userService = userService;
     }
 
     @SneakyThrows
-    public UserController() {
+    public UserServlet() {
         this.userService = new UserService(Database.getConnection());
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
 
-
-        if (user == null || user.getRole() != Role.ADMIN) {
-
+        if (userDTO == null || userDTO.getRole() != Role.ADMIN) {
             response.sendRedirect(request.getContextPath() + "/materials");
             return;
         }
-
 
         String action = request.getPathInfo();
 
         try {
             if (action == null || "/".equals(action)) {
-
-                List<User> users = userService.getAllUsers();
+                List<UserDTO> users = userService.getAllUsers();
                 request.setAttribute("users", users);
                 request.getRequestDispatcher("/WEB-INF/views/users.jsp").forward(request, response);
             } else if ("/addUser".equals(action)) {
-
                 request.getRequestDispatcher("/WEB-INF/views/addUser.jsp").forward(request, response);
             } else if ("/editUser".equals(action)) {
-
                 String idParam = request.getParameter("id");
                 if (idParam != null && !idParam.isEmpty()) {
                     int userId = Integer.parseInt(idParam);
-                    User editUser = userService.getUserById(userId);
+                    UserDTO editUser = userService.getUserById(userId);
 
                     if (editUser != null) {
                         request.setAttribute("user", editUser);
@@ -82,16 +78,13 @@ public class UserController extends HttpServlet {
         }
     }
 
-
     @SneakyThrows
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         HttpSession session = request.getSession();
-        User user = (User) session.getAttribute("user");
+        UserDTO userDTO = (UserDTO) session.getAttribute("user");
 
-
-        if (user == null || user.getRole() != Role.ADMIN) {
+        if (userDTO == null || userDTO.getRole() != Role.ADMIN) {
             response.sendRedirect(request.getContextPath() + "/materials");
             return;
         }
@@ -99,21 +92,19 @@ public class UserController extends HttpServlet {
         String action = request.getPathInfo();
 
         if ("/addUser".equals(action)) {
-
             String username = request.getParameter("username");
             String email = request.getParameter("email");
             String password = request.getParameter("password");
             Role role = Role.valueOf(request.getParameter("role"));
 
             try {
-
                 userService.registerUser(username, email, password, role);
                 response.sendRedirect(request.getContextPath() + "/users");
             } catch (Exception e) {
                 request.setAttribute("errorMessage", e.getMessage());
                 request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
             }
-        } else if ("/editUser".equals(action) && user.getRole() == Role.ADMIN) {
+        } else if ("/editUser".equals(action)) {
             String idParam = request.getParameter("id");
 
             if (idParam != null && !idParam.isEmpty()) {
@@ -122,14 +113,8 @@ public class UserController extends HttpServlet {
                 String email = request.getParameter("email");
                 String roleParam = request.getParameter("role");
                 Role role = Role.valueOf(roleParam);
-                String password = request.getParameter("password");
 
-                User editUser = userService.getUserById(userId);
-                editUser.setId(userId);
-                editUser.setUsername(username);
-                editUser.setEmail(email);
-                editUser.setRole(role);
-                editUser.setPassword(password);
+                UserDTO editUser = new UserDTO(userId, username, email, role);
 
                 try {
                     userService.updateUser(editUser);
@@ -141,8 +126,7 @@ public class UserController extends HttpServlet {
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid User ID");
             }
-        }
-        else if (action.matches("/\\d+") && user.getRole() == Role.ADMIN) {
+        } else if (action.matches("/\\d+")) {
             int userId = Integer.parseInt(action.substring(1));
 
             try {
@@ -157,5 +141,3 @@ public class UserController extends HttpServlet {
         }
     }
 }
-
-

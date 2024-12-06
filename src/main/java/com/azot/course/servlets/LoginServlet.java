@@ -1,7 +1,8 @@
-package com.azot.course.controller;
+package com.azot.course.servlets;
 
-import com.azot.course.data.Role;
-import com.azot.course.entity.User;
+import com.azot.course.DTO.UserDTO;
+import com.azot.course.user.Role;
+import com.azot.course.models.User;
 import com.azot.course.service.UserService;
 import com.azot.course.util.Database;
 import lombok.SneakyThrows;
@@ -16,10 +17,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 @WebServlet("/login")
-public class LoginController extends HttpServlet {
+public class LoginServlet extends HttpServlet {
     private final UserService userService;
 
-    public LoginController() throws SQLException {
+    public LoginServlet() throws SQLException {
         this.userService = new UserService(Database.getConnection());
     }
 
@@ -37,11 +38,13 @@ public class LoginController extends HttpServlet {
             String password = request.getParameter("password");
 
 
-            User user = userService.getUserByUsername(username);
+            User user = userService.getFullUserByUsername(username);
+
 
             if (user != null && userService.authenticateUser(password, user)) {
                 HttpSession session = request.getSession();
-                session.setAttribute("user", user);
+                UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+                session.setAttribute("user", userDTO);
 
 
                 if (user.getRole() == Role.ADMIN) {
