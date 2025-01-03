@@ -1,22 +1,17 @@
 package com.azot.course.servlets;
 
-import com.azot.course.DAO.CommentDAO;
 import com.azot.course.DTO.CommentDTO;
 import com.azot.course.DTO.UserDTO;
-import com.azot.course.models.Comment;
-import com.azot.course.models.Material;
-import com.azot.course.models.User;
 import com.azot.course.service.CommentService;
-import com.azot.course.util.Database;
-import lombok.SneakyThrows;
+import com.azot.course.database.Database;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,12 +20,7 @@ public class CommentServlet extends HttpServlet {
 
     private final CommentService commentService;
 
-    public CommentServlet(CommentService commentService) {
-        this.commentService = commentService;
-    }
-
-    @SneakyThrows
-    public CommentServlet() {
+    public CommentServlet() throws SQLException {
         this.commentService = new CommentService(Database.getConnection());
     }
 
@@ -42,54 +32,51 @@ public class CommentServlet extends HttpServlet {
             request.setAttribute("comments", comments);
             request.getRequestDispatcher("/WEB-INF/views/viewMaterial.jsp").forward(request, response);
         } catch (Exception e) {
-            request.setAttribute("errorMessage", e.getMessage());
+            log("Ошибка при загрузке комментариев", e);
+            request.setAttribute("errorMessage", "Не удалось загрузить комментарии.");
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0);
         String action = request.getParameter("action");
-
         if ("deleteComment".equals(action)) {
-
-            int commentId = Integer.parseInt(request.getParameter("commentId"));
-            try {
-                commentService.deleteComment(commentId);
-                response.sendRedirect(request.getHeader("Referer"));
-            } catch (Exception e) {
-                request.setAttribute("errorMessage", "Ошибка при удалении комментария: " + e.getMessage());
-                request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
-            }
-            return;
+            handleDeleteComment(request, response);
+        } else {
+            handleAddComment(request, response);
         }
+    }
 
-        String materialIdStr = request.getParameter("materialId");
-        int materialId;
-
-        try {
-
-            materialId = Integer.parseInt(materialIdStr);
-        } catch (NumberFormatException e) {
-            request.setAttribute("errorMessage", "Неверный идентификатор материала");
-            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
-            return;
-        }
-
-        HttpSession session = request.getSession();
-        UserDTO user = (UserDTO) session.getAttribute("user");
-
+    private UserDTO getAuthenticatedUser(HttpServletRequest request) throws ServletException {
+        UserDTO user = (UserDTO) request.getSession().getAttribute("user");
         if (user == null) {
-            request.setAttribute("errorMessage", "Пользователь не авторизован");
-            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
-            return;
+            throw new ServletException("Пользователь не авторизован");
         }
+        return user;
+    }
 
+    private void handleDeleteComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int commentId = Integer.parseInt(request.getParameter("commentId"));
+        try {
+            commentService.deleteComment(commentId);
+            response.setStatus(HttpServletResponse.SC_OK);
+        } catch (Exception e) {
+            log("Ошибка при удалении комментария", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private void handleAddComment(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int materialId = Integer.parseInt(request.getParameter("materialId"));
+        UserDTO user = getAuthenticatedUser(request);
         String commentText = request.getParameter("commentText");
+
         if (commentText == null || commentText.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Комментарий не может быть пустым");
-            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
@@ -99,13 +86,23 @@ public class CommentServlet extends HttpServlet {
         comment.setUsername(user.getUsername());
         comment.setAuthorId(user.getId());
 
-
         try {
             commentService.addComment(materialId, comment);
-            response.sendRedirect(request.getContextPath() + "/materials/view?materialId=" + materialId);
+
+
+            response.setContentType("text/html");
+            response.getWriter().write(generateCommentHtml(comment));
         } catch (Exception e) {
-            request.setAttribute("errorMessage", "Ошибка при добавлении комментария: " + e.getMessage());
-            request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
+            log("Ошибка при добавлении комментария", e);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String generateCommentHtml(CommentDTO comment) {
+        return "<div class='comment'>" +
+                "<div class='comment-author'>" + comment.getUsername() + "</div>" +
+                "<div class='comment-date'>" + comment.getCreatedAt() + "</div>" +
+                "<div class='comment-text'>" + comment.getText() + "</div>" +
+                "</div>";
     }
 }

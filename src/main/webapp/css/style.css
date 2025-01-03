@@ -30,20 +30,20 @@ form {
 }
 
 main input[type="submit"] {
-    padding: 10px 15px; /* Увеличиваем внутренние отступы */
-    border-radius: 5px; /* Закругление углов */
-    color: #fff; /* Цвет текста */
-    background-color: #444 !important; /* Темный цвет фона кнопки */
-    font-size: 16px; /* Размер шрифта */
-    cursor: pointer; /* Указатель при наведении */
-    border: none; /* Убираем границу */
-    height: 40px; /* Фиксированная высота */
-    width: 100%; /* Ширина кнопки на всю ширину формы */
-    transition: background-color 0.3s; /* Плавный переход фона */
-    margin-top: 10px; /* Отступ сверху для кнопки */
-    box-sizing: border-box; /* Учитываем padding и border в ширину */
+    padding: 10px 15px;
+    border-radius: 5px;
+    color: #fff;
+    background-color: #444 !important;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    height: 40px;
+    width: 100%;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+    box-sizing: border-box;
 }
 
 main input[type="submit"]:hover {
-    background-color: #666 !important; /* Цвет кнопки при наведении */
+    background-color: #666 !important;
 }

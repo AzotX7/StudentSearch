@@ -61,22 +61,22 @@
         label {
             display: block;
             margin-bottom: 5px;
-            color: #bbb; /* Цвет для меток */
+            color: #bbb;
         }
         input[type="text"],
         input[type="email"] {
             width: 100%;
             padding: 10px;
-            border: 1px solid #444; /* Цвет границы */
+            border: 1px solid #444;
             border-radius: 4px;
             box-sizing: border-box;
             transition: border-color 0.3s;
-            background-color: #222; /* Цвет фона для полей ввода */
-            color: #fff; /* Цвет текста в полях ввода */
+            background-color: #222;
+            color: #fff;
         }
         input[type="text"]:focus,
         input[type="email"]:focus {
-            border-color: #007bff; /* Цвет границы при фокусе */
+            border-color: #007bff;
             outline: none;
         }
         button {
@@ -91,7 +91,7 @@
             transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #666; /* Цвет кнопки при наведении */
+            background-color: #666;
         }
         .error-message {
             color: red;
@@ -103,11 +103,11 @@
             text-align: center;
             margin-top: 20px;
             text-decoration: none;
-            color: white; /* Цвет ссылки */
+            color: white;
             transition: color 0.3s;
         }
         .back-link:hover {
-            color: #666; /* Цвет ссылки при наведении */
+            color: #666;
         }
     </style>
 </head>

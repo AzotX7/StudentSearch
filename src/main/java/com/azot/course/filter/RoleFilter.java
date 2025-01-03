@@ -1,4 +1,4 @@
-package com.azot.course.util;
+package com.azot.course.filter;
 
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.user.Role;
@@ -25,6 +25,11 @@ public class RoleFilter implements Filter {
         HttpSession session = httpRequest.getSession(false);
         UserDTO userDTO = (session != null) ? (UserDTO) session.getAttribute("user") : null;
 
+        if (userDTO != null && (path.contains("/login") || path.contains("/register"))) {
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/materials");
+            return;
+        }
+
         if (path.contains("/login") || path.contains("/register") || path.contains("/logout") || path.equals(httpRequest.getContextPath() + "/")) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
@@ -37,7 +42,7 @@ public class RoleFilter implements Filter {
                 filterChain.doFilter(servletRequest, httpResponse);
                 return;
             } else if (role == Role.USER) {
-                if (path.contains("/materials") || path.contains("/comments") || path.contains("/profile") || path.contains("/myMaterials")) {
+                if (path.contains("/materials") || path.contains("/comments") || path.contains("/profile") || path.contains("/myMaterials") || path.contains("/favorites") || path.contains("/photo")) {
                     filterChain.doFilter(servletRequest, httpResponse);
                     return;
                 } else {

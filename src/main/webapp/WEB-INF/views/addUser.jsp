@@ -28,7 +28,7 @@
         h1 {
             margin: 0;
             font-size: 24px;
-            flex-grow: 1; /* Позволяет заголовку занимать оставшееся пространство */
+            flex-grow: 1;
             text-align: center;
         }
         .back-button {
@@ -47,7 +47,7 @@
         main {
             padding: 20px;
             max-width: 600px;
-            margin: 40px auto; /* Увеличен отступ сверху для лучшего размещения */
+            margin: 40px auto;
             background: #222;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -55,7 +55,7 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Отступы между элементами формы */
+            gap: 15px;
         }
         input[type="text"],
         input[type="email"],
@@ -85,8 +85,8 @@
 </head>
 <body>
 <header>
-    <div class="logo">StudentSearchAdmin</div> <!-- Название добавлено влево -->
-    <a href="${pageContext.request.contextPath}/users" class="back-button">Вернуться к пользователям</a> <!-- Кнопка "Вернуться к пользователям" -->
+    <div class="logo">StudentSearchAdmin</div>
+    <a href="${pageContext.request.contextPath}/users" class="back-button">Вернуться к пользователям</a>
 </header>
 <main>
     <form action="${pageContext.request.contextPath}/users/addUser" method="post">

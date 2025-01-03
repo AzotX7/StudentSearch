@@ -30,24 +30,24 @@
             margin: 0;
             font-size: 24px;
             text-align: center;
-            flex-grow: 1; /* Позволяет заголовку занимать оставшееся пространство */
+            flex-grow: 1;
         }
         .back-button {
-            background-color: #444; /* Цвет кнопки */
-            color: #ffffff; /* Цвет текста кнопки */
-            border: none; /* Убираем рамку */
-            border-radius: 5px; /* Округленные края */
-            padding: 10px 15px; /* Отступы внутри кнопки */
-            cursor: pointer; /* Указатель при наведении */
-            transition: background-color 0.3s; /* Плавный переход */
+            background-color: #444;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
         .back-button:hover {
-            background-color: #666; /* Цвет кнопки при наведении */
+            background-color: #666;
         }
         main {
             padding: 20px;
             max-width: 600px;
-            margin: 40px auto; /* Увеличен отступ сверху для лучшего размещения */
+            margin: 40px auto;
             background: #222;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -55,7 +55,7 @@
         form {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Отступы между элементами формы */
+            gap: 15px;
         }
         input[type="text"],
         input[type="email"],
@@ -84,7 +84,7 @@
 </head>
 <body>
 <header>
-    <div class="logo">StudentSearchAdmin</div> <!-- Название добавлено влево -->
+    <div class="logo">StudentSearchAdmin</div>
     <form action="${pageContext.request.contextPath}/users" method="get" style="margin-left: 20px;">
         <input type="submit" value="Вернуться к пользователям" class="back-button">
     </form>

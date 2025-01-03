@@ -1,4 +1,4 @@
-package com.azot.course.util;
+package com.azot.course.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

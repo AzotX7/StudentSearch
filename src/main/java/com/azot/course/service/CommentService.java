@@ -10,40 +10,31 @@ import com.azot.course.models.User;
 import lombok.SneakyThrows;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommentService {
-    private final CommentDAOImpl commentDAO;
+    private final CommentDAO commentDAO;
 
 
     public CommentService(Connection connection)     {
         this.commentDAO = new CommentDAOImpl(connection);
     }
 
-    @SneakyThrows
-    public void addComment(int materialId,CommentDTO commentDTO){
+
+    public void addComment(int materialId,CommentDTO commentDTO) throws SQLException {
         Comment comment = fromDTO(commentDTO,materialId);
         commentDAO.addComment(materialId,comment);
     }
 
-    @SneakyThrows
-    public CommentDTO getCommentById(int id) {
-        Comment comment = commentDAO.getCommentById(id);
-        return toDTO(comment);
-    }
 
-    @SneakyThrows
-    public List<CommentDTO> getAllComments(){
-        return commentDAO.getAllComments().stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    @SneakyThrows
-    public void deleteComment(int id) {
+    public void deleteComment(int id) throws SQLException {
         commentDAO.deleteComment(id);
     }
-    @SneakyThrows
-    public List<CommentDTO> getCommentsByMaterialId(int materialId){
+
+
+    public List<CommentDTO> getCommentsByMaterialId(int materialId) throws SQLException{
         return commentDAO.findCommentsByMaterialId(materialId).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
@@ -71,8 +62,6 @@ public class CommentService {
         Material material = new Material();
         material.setId(materialId);
         comment.setMaterial(material);
-
-
 
         return comment;
     }

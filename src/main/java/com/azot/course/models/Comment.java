@@ -9,7 +9,9 @@ import java.util.Date;
 @NoArgsConstructor
 public class Comment {
     private int id;
+
     private String text;
+
     private Date createdAt;
 
     private User author;

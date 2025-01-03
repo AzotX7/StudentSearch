@@ -7,17 +7,17 @@
     <title>Добавить материал</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        /* Общий стиль для страницы */
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #111;
             color: #fff;
-            overflow: hidden; /* Убираем возможность прокрутки страницы */
+            overflow: hidden;
         }
 
-        /* Верхняя навигация */
+
         header {
             background: #1a1a1a;
             color: #ffffff;
@@ -53,26 +53,26 @@
             border-color: #444;
         }
 
-        /* Центральное название */
+
         .main-title {
             text-align: center;
             margin: 50px 0;
-            font-size: 32px; /* Уменьшен размер шрифта */
+            font-size: 32px;
             font-weight: bold;
             color: #e0e0e0;
         }
 
-        /* Основная часть с формой */
+
         main {
-            max-width: 600px; /* Максимальная ширина формы */
-            margin: 20px auto; /* Центрируем форму */
-            padding: 20px; /* Отступы внутри формы */
-            background-color: #222; /* Цвет фона формы */
-            border-radius: 8px; /* Закругление углов формы */
-            border: 1px solid #444; /* Цвет границы формы */
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #222;
+            border-radius: 8px;
+            border: 1px solid #444;
         }
 
-        /* Стили для полей ввода */
+
         form input[type="text"], form textarea {
             width: 100%;
             margin-bottom: 10px;
@@ -81,40 +81,78 @@
             border: 1px solid #333;
             background-color: #222;
             color: #ffffff;
-            box-sizing: border-box; /* Учитываем padding и border в ширину */
+            box-sizing: border-box;
         }
 
-        /* Стили для кнопки */
+
         input[type="submit"] {
-            padding: 10px 15px; /* Увеличиваем внутренние отступы */
-            border-radius: 5px; /* Закругление углов */
-            color: #fff; /* Цвет текста */
-            background-color: #444; /* Темный цвет фона кнопки */
-            font-size: 16px; /* Размер шрифта */
-            cursor: pointer; /* Указатель при наведении */
-            border: none; /* Убираем границу */
-            height: 40px; /* Фиксированная высота */
-            width: 100%; /* Ширина кнопки на всю ширину формы */
-            transition: background-color 0.3s; /* Плавный переход фона */
-            margin-top: 10px; /* Отступ сверху для кнопки */
-            box-sizing: border-box; /* Учитываем padding и border в ширину */
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #444;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            height: 40px;
+            width: 100%;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+            box-sizing: border-box;
         }
 
         input[type="submit"]:hover {
-            background-color: #666; /* Цвет кнопки при наведении */
+            background-color: #666;
         }
 
-        /* Убираем возможность растягивания содержимого */
+
         textarea {
-            resize: none; /* Запрет на изменение размера текстовой области */
+            resize: none;
         }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            margin-bottom: 10px;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #222;
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .file-input-label:hover {
+            background-color: #444;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
     </style>
+
 </head>
 <body>
 <header>
     <div class="logo">StudentSearch</div>
     <nav>
-        <a href="${pageContext.request.contextPath}/materials">Ко всем материалам</a> <!-- Кнопка для перехода ко всем материалам -->
+        <a href="${pageContext.request.contextPath}/materials">Ко всем материалам</a>
         <c:if test="${not empty user}">
             <a href="${pageContext.request.contextPath}/materials/profile">Личный кабинет</a>
             <a href="${pageContext.request.contextPath}/logout">Выход</a>
@@ -128,15 +166,18 @@
 <div class="main-title">Добавление нового материала</div>
 
 <main>
-    <form action="${pageContext.request.contextPath}/materials/add" method="post">
+    <form action="${pageContext.request.contextPath}/materials/add" method="post" enctype="multipart/form-data">
         <label for="title">Название:</label>
         <input type="text" id="title" name="title" required>
 
         <label for="content">Содержимое:</label>
         <textarea id="content" name="content" required></textarea>
 
-        <label for="imageUrl">URL изображения:</label>
-        <input type="text" id="imageUrl" name="imageUrl" required>
+        <label for="file">Изображение:</label>
+        <div class="file-input-container">
+            <label for="file" id="file-label" class="file-input-label">Выберите изображение</label>
+            <input type="file" id="file" name="file" required>
+        </div>
 
         <label>Категории:</label>
         <c:forEach var="category" items="${categories}">
@@ -148,5 +189,24 @@
         <input type="submit" value="Добавить материал">
     </form>
 </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("file");
+        const fileLabel = document.getElementById("file-label");
+
+        if (fileInput && fileLabel) {
+            fileInput.addEventListener("change", function () {
+                if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileLabel.textContent = fileName;
+                } else {
+                    fileLabel.textContent = "Выберите изображение";
+                }
+            });
+        } else {
+            console.error("Элементы fileInput или fileLabel не найдены!");
+        }
+    });
+</script>
 </body>
 </html>

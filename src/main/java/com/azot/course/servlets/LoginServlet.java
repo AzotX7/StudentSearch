@@ -1,11 +1,10 @@
 package com.azot.course.servlets;
 
 import com.azot.course.DTO.UserDTO;
-import com.azot.course.user.Role;
 import com.azot.course.models.User;
 import com.azot.course.service.UserService;
-import com.azot.course.util.Database;
-import lombok.SneakyThrows;
+import com.azot.course.database.Database;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,13 +23,13 @@ public class LoginServlet extends HttpServlet {
         this.userService = new UserService(Database.getConnection());
     }
 
-    @SneakyThrows
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
-    @SneakyThrows
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -40,23 +39,21 @@ public class LoginServlet extends HttpServlet {
 
             User user = userService.getFullUserByUsername(username);
 
-
             if (user != null && userService.authenticateUser(password, user)) {
                 HttpSession session = request.getSession();
                 UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
                 session.setAttribute("user", userDTO);
 
+                String redirectUrl = user.getRole().toString().equals("ADMIN") ? "/users" : "/materials";
+                response.sendRedirect(request.getContextPath() + redirectUrl);
 
-                if (user.getRole() == Role.ADMIN) {
-                    response.sendRedirect(request.getContextPath() + "/users");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/materials");
-                }
             } else {
                 request.setAttribute("errorMessage", "Неверное имя пользователя или пароль");
                 request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
             }
+
         } catch (Exception e) {
+            log("Неизвестная ошибка", e);
             request.setAttribute("errorMessage", "Произошла ошибка: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
         }

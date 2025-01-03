@@ -69,7 +69,7 @@
         .btn {
             width: 100%;
             padding: 10px;
-            background-color: #444; /* Оригинальный зеленый цвет кнопки */
+            background-color: #444;
             border: none;
             color: white;
             font-size: 16px;
