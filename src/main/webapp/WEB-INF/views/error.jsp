@@ -6,7 +6,6 @@
     <title>Error</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
     <style>
-        /* Стили для error.jsp */
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -53,7 +52,7 @@
             background-color: #2980b9;
         }
 
-        /* Мобильная адаптация */
+
         @media (max-width: 600px) {
             .error-container {
                 padding: 20px;
@@ -71,11 +70,11 @@
 </head>
 <body>
     <div class="error-container">
-        <h1 class="error-title">Oops! Something went wrong.</h1>
+        <h1 class="error-title">Упс! Что-то пошло не так.</h1>
         <p class="error-message">
-            ${errorMessage != null ? errorMessage : "An unexpected error has occurred. Please try again later."}
+            ${errorMessage != null ? errorMessage : "Произошла непредвиденная ошибка. Пожалуйста, попробуйте позже."}
         </p>
-        <a href="${pageContext.request.contextPath}/register" class="home-link">Return to Home</a>
+        <a href="${pageContext.request.contextPath}/materials" class="home-link">Вернуться на главную</a>
     </div>
 </body>
 </html>

@@ -10,7 +10,7 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #111;
-            color: #fff;
+            color: #444;
             margin: 0;
             padding: 0;
         }
@@ -45,7 +45,7 @@
             max-width: 600px;
             margin: 40px auto;
             padding: 20px;
-            background: white;
+            background: #333;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;

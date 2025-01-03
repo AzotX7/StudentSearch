@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>Управление пользователями</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -44,7 +45,7 @@
             border-color: #444;
         }
         .btn-large {
-            font-size: 16px; /* Размер шрифта для кнопки "Добавить пользователя" */
+            font-size: 16px;
         }
         main {
             padding: 20px;
@@ -64,6 +65,7 @@
             padding: 15px;
             margin-bottom: 15px;
             background-color: #333;
+            position: relative;
         }
         .user h3 {
             margin: 0;
@@ -72,27 +74,35 @@
         .action-buttons {
             display: flex;
             justify-content: flex-start;
-            margin-top: 10px;
+            gap: 10px;
+            align-items: flex-end;
+            margin-top: auto;
         }
-        .btn-small {
-            padding: 5px 0;
-            font-size: 14px;
-            margin-right: 5px;
-            width: 4cm; /* Установлена фиксированная ширина 4 см для обеих кнопок */
-            background-color: #007bff; /* Фон кнопки редактирования */
-            color: #ffffff; /* Цвет текста кнопки редактирования */
-            border: none; /* Убрать рамку */
-            border-radius: 5px; /* Округленные края кнопки */
-            cursor: pointer; /* Указатель при наведении */
-            text-align: center; /* Выравнивание текста по центру */
-        }
-        .btn-small:hover {
-            background-color: #0056b3; /* Цвет кнопки при наведении */
-        }
+
         .search-container {
             margin-bottom: 20px;
             text-align: center;
         }
+
+        .btn-edit, .btn-delete {
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-right: 10px;
+            background-color: #444;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            width: 150px;
+            height: 40px;
+        }
+
+        .btn-edit:hover, .btn-delete:hover {
+            background-color: #666;
+        }
+
+
         .search-container input[type="text"] {
             padding: 10px;
             border-radius: 5px;
@@ -103,11 +113,33 @@
             font-size: 16px;
         }
     </style>
-    <script>
-        function confirmDelete(userId) {
-            return confirm("Вы уверены, что хотите удалить этого пользователя?");
+<script>
+    function deleteUser(userId) {
+        if (confirm("Вы уверены, что хотите удалить этого пользователя?")) {
+            $.ajax({
+                url: '${pageContext.request.contextPath}/users/' + userId,
+                type: 'POST',
+                data: {
+                    '_method': 'delete'
+                },
+                success: function(response) {
+
+
+                    if (response === "success") {
+                        $('#user-' + userId).remove();
+                        alert('Пользователь успешно удален');
+                    } else {
+                        alert('Произошла ошибка при удалении');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                    alert('Ошибка при удалении пользователя: ' + error);
+                }
+            });
         }
-    </script>
+    }
+</script>
 </head>
 <body>
 <header>
@@ -135,19 +167,16 @@
     </c:if>
 
     <c:forEach var="user" items="${users}">
-        <div class="user">
+        <div class="user" id="user-${user.id}">
             <h3>${user.username}</h3>
             <p>Email: ${user.email}</p>
             <p>Роль: ${user.role}</p>
             <div class="action-buttons">
-                <form action="${pageContext.request.contextPath}/users/editUser" method="get" style="display:inline;">
+                <form action="${pageContext.request.contextPath}/users/editUser" method="get">
                     <input type="hidden" name="id" value="${user.id}">
-                    <input type="submit" value="Редактировать" class="btn-small">
+                    <input type="submit" value="Редактировать" class="btn-edit">
                 </form>
-                <form action="${pageContext.request.contextPath}/users/${user.id}" method="post" style="display:inline;">
-                    <input type="hidden" name="_method" value="delete">
-                    <input type="submit" value="Удалить" class="btn-small" onclick="return confirmDelete(${user.id});">
-                </form>
+                <button class="btn-delete" onclick="deleteUser(${user.id});">Удалить</button>
             </div>
         </div>
     </c:forEach>

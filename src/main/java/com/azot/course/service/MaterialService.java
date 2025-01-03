@@ -4,23 +4,25 @@ import com.azot.course.DAO.DAOImpl.MaterialDAOImpl;
 import com.azot.course.DAO.MaterialDAO;
 import com.azot.course.DTO.MaterialDTO;
 import com.azot.course.models.Category;
+import com.azot.course.models.Image;
 import com.azot.course.models.Material;
 import com.azot.course.models.User;
 import lombok.SneakyThrows;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MaterialService {
 
-    private final MaterialDAOImpl materialDAO;
+    private final MaterialDAO materialDAO;
 
     public MaterialService(Connection connection){
         this.materialDAO = new MaterialDAOImpl(connection);
     }
-    @SneakyThrows
-    public void addMaterial(MaterialDTO materialDTO) {
+
+    public void addMaterial(MaterialDTO materialDTO) throws SQLException {
         Material material = fromDTO(materialDTO);
         materialDAO.addMaterial(material);
 
@@ -31,53 +33,38 @@ public class MaterialService {
         }
     }
 
-    @SneakyThrows
-    public MaterialDTO getMaterialById(int id) {
+
+    public MaterialDTO getMaterialById(int id) throws SQLException {
         Material material = materialDAO.getMaterialById(id);
         return toDTO(material);
     }
 
-    @SneakyThrows
-    public List<MaterialDTO> getAllMaterials() {
+    public List<MaterialDTO> getAllMaterials() throws SQLException {
         return materialDAO.getAllMaterials().stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    @SneakyThrows
-    public List<MaterialDTO> searchMaterials(String query, List<Integer> categoryIds){
+
+    public List<MaterialDTO> searchMaterials(String query, List<Integer> categoryIds) throws SQLException{
         return materialDAO.searchMaterials(query,categoryIds).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    @SneakyThrows
-    public List<MaterialDTO> searchMaterialsByTitle(String query){
+
+    public List<MaterialDTO> searchMaterialsByTitle(String query) throws SQLException{
         return materialDAO.searchMaterialsByTitle(query).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    @SneakyThrows
-    public void updateMaterial(MaterialDTO materialDTO) {
+
+    public void updateMaterial(MaterialDTO materialDTO) throws SQLException {
         Material material = fromDTO(materialDTO);
         materialDAO.updateMaterial(material);    }
 
-    @SneakyThrows
-    public void deleteMaterial(int id) {
+
+    public void deleteMaterial(int id) throws SQLException {
         materialDAO.deleteMaterial(id);
     }
-    @SneakyThrows
-    public List<Category> getCategoriesForMaterial(int materialId) {
-        return materialDAO.getCategoriesByMaterialId(materialId);
-    }
 
-    @SneakyThrows
-    public List<MaterialDTO> findMaterialsByIds(List<Integer> ids){
-        return materialDAO.findMaterialsByIds(ids).stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    @SneakyThrows
-    public void addCategoryToMaterial(int materialId, int categoryId) {
-        materialDAO.addCategoryToMaterial(materialId, categoryId);
-    }
-    @SneakyThrows
-    public void removeCategoryFromMaterial(int materialId, int categoryId) {
-        materialDAO.removeCategoryFromMaterial(materialId, categoryId);
+    public List<MaterialDTO> getMaterialsByUserId(int userId) throws SQLException {
+        return materialDAO.getMaterialsByUserId(userId).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     private MaterialDTO toDTO(Material material) {
@@ -86,7 +73,7 @@ public class MaterialService {
                 material.getTitle(),
                 material.getContent(),
                 material.getCreatedAt(),
-                material.getImageURL(),
+                material.getImage() != null ? material.getImage().getId() : 0,
                 material.getAuthor() != null ? material.getAuthor().getId() : 0,
                 material.getCategories()
         );
@@ -98,11 +85,15 @@ public class MaterialService {
         material.setTitle(materialDTO.getTitle());
         material.setContent(materialDTO.getContent());
         material.setCreatedAt(materialDTO.getCreatedAt());
-        material.setImageURL(materialDTO.getImageURL());
+
 
         User user = new User();
         user.setId(materialDTO.getAuthorId());
         material.setAuthor(user);
+
+        Image photo = new Image();
+        photo.setId(materialDTO.getPhotoId());
+        material.setImage(photo);
 
         return material;
     }

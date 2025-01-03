@@ -1,5 +1,8 @@
-package com.azot.course.models;
+package com.azot.course.DTO;
 
+import com.azot.course.models.Category;
+import com.azot.course.models.Image;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,20 +11,15 @@ import java.util.Date;
 
 @Data
 @NoArgsConstructor
-public class Material {
+@AllArgsConstructor
+public class MaterialDTO {
 
     private int id;
     private String title;
     private String content;
     private Date createdAt;
-
-    private Image image;
-
-    private User author;
-
-    private List<Comment> comments;
-
+    private int photoId;
+    private int authorId;
     private List<Category> categories;
 
-    private String ImageUrl;
 }

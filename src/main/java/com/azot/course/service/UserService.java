@@ -1,6 +1,7 @@
 package com.azot.course.service;
 
 import com.azot.course.DAO.DAOImpl.UserDAOImpl;
+import com.azot.course.DAO.UserDAO;
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.user.Role;
 import com.azot.course.models.User;
@@ -15,19 +16,13 @@ import java.util.stream.Collectors;
 
 public class UserService {
 
-    private final UserDAOImpl userDAO;
+    private final UserDAO userDAO;
 
     public UserService(Connection connection) {
         this.userDAO = new UserDAOImpl(connection);
     }
 
     public void registerUser(String username, String email, String password, Role role) throws SQLException {
-        if (userDAO.userExistsByUsername(username)) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        if (userDAO.userExistsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists");
-        }
 
         User user = new User();
         byte[] salt = PasswordUtil.generateSalt();
@@ -42,6 +37,7 @@ public class UserService {
 
         userDAO.addUser(user);
     }
+
     public List<UserDTO> getAllUsers() throws SQLException {
         List<User> users = userDAO.getAllUsers();
         return users.stream()
@@ -49,18 +45,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+
     public void updateUser(UserDTO userDTO) throws SQLException {
         User user = userDAO.getUserById(userDTO.getId());
         if (user == null) {
             throw new SQLException("User not found with id " + userDTO.getId());
         }
 
-        if (!user.getUsername().equals(userDTO.getUsername()) && userDAO.userExistsByUsername(userDTO.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        if (!user.getEmail().equals(userDTO.getEmail()) && userDAO.userExistsByEmail(userDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setRole(userDTO.getRole());
@@ -69,9 +60,11 @@ public class UserService {
     }
 
 
+
     public void deleteUser(int id) throws SQLException {
         userDAO.deleteUser(id);
     }
+
 
 
     public UserDTO getUserById(int id) throws SQLException {
@@ -90,20 +83,23 @@ public class UserService {
         return PasswordUtil.verifyPassword(inputPassword, user.getPassword(), salt);
     }
 
+
     public User getFullUserByUsername(String username) throws SQLException {
         return userDAO.getUserByUsername(username);
     }
 
-    private UserDTO toDTO(User user) {
-        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+    public List<UserDTO> searchUsers(String query) throws SQLException{
+        return userDAO.searchUsers(query).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    private User fromDTO(UserDTO userDTO) {
-        User user = new User();
-        user.setId(userDTO.getId());
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setRole(userDTO.getRole());
-        return user;
+    public boolean isEmailExists(String email) throws SQLException {
+        return userDAO.userExistsByEmail(email);
+    }
+
+    public boolean isUsernameExists(String username) throws SQLException {
+        return userDAO.userExistsByUsername(username);
+    }
+    private UserDTO toDTO(User user) {
+        return new UserDTO(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
     }
 }

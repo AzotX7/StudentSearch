@@ -9,79 +9,79 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #111; /* Темный фон для соответствия стилю */
+            background-color: #111;
             margin: 0;
             padding: 0;
-            color: #fff; /* Белый текст для контраста */
+            color: #fff;
         }
 
         header {
-            background: #1a1a1a; /* Темный фон заголовка */
-            color: #e0e0e0; /* Светлый текст */
+            background: #1a1a1a;
+            color: #e0e0e0;
             padding: 20px;
-            display: flex; /* Используем flexbox для выравнивания */
-            justify-content: space-between; /* Пространство между элементами */
-            align-items: center; /* Вертикальное выравнивание */
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4); /* Тень для заголовка */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.4);
         }
 
         .logo {
-            font-size: 24px; /* Размер шрифта для названия сайта */
-            font-weight: bold; /* Жирный шрифт */
-            color: #e0e0e0; /* Цвет текста */
-            margin: 0; /* Убираем отступы */
+            font-size: 24px;
+            font-weight: bold;
+            color: #e0e0e0;
+            margin: 0;
         }
 
         main {
-            max-width: 800px; /* Ширина основного контейнера */
-            margin: 40px auto; /* Центрирование на странице */
+            max-width: 800px;
+            margin: 40px auto;
             padding: 20px;
-            background: #222; /* Темный фон для основного блока */
-            border-radius: 8px; /* Закругленные углы */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Тень для основного блока */
+            background: #222;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
             text-align: center;
         }
 
         .material {
-            border: 1px solid #444; /* Темная рамка для материалов */
-            padding: 15px; /* Отступ внутри блока материала */
+            border: 1px solid #444;
+            padding: 15px;
             margin: 10px 0;
-            border-radius: 5px; /* Закругленные углы */
-            background-color: #333; /* Темный фон для материала */
-            color: #e0e0e0; /* Светлый текст */
+            border-radius: 5px;
+            background-color: #333;
+            color: #e0e0e0;
         }
 
         h3 {
-            margin: 0; /* Убираем отступы */
-            color: #white; /* Цвет заголовка материала */
+            margin: 0;
+            color: #white;
         }
 
         .button {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
-            background-color: #444; /* Основной цвет кнопки */
+            background-color: #444;
             color: white;
             border-radius: 5px;
             text-decoration: none;
-            transition: background-color 0.3s; /* Плавный переход цвета */
+            transition: background-color 0.3s;
         }
 
         .button:hover {
-            background-color: #666; /* Цвет кнопки при наведении */
+            background-color: #666;
         }
 
-        /* Сообщение для отсутствия материалов */
+
         .empty-message {
-            color: #e0e0e0; /* Цвет сообщения */
-            font-size: 18px; /* Размер шрифта */
+            color: #e0e0e0;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 <header>
-    <div class="logo">StudentSearch</div> <!-- Название сайта -->
-    <h1>Мои материалы</h1> <!-- Заголовок страницы -->
+    <div class="logo">StudentSearch</div>
+    <h1>Мои материалы</h1>
 </header>
 
 <main>
@@ -89,12 +89,11 @@
         <c:forEach var="material" items="${materials}">
             <div class="material">
                 <h3>${material.title}</h3>
-                <p>${material.content}</p>
             </div>
         </c:forEach>
     </c:if>
     <c:if test="${empty materials}">
-        <p class="empty-message">У вас пока нет материалов.</p> <!-- Добавлено сообщение о пустом списке -->
+        <p class="empty-message">У вас пока нет материалов.</p>
     </c:if>
     <a class="button" href="${pageContext.request.contextPath}/materials">Перейти ко всем материалам</a>
 </main>

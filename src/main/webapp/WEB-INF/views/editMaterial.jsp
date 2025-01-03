@@ -72,7 +72,7 @@
             font-size: 16px;
         }
         textarea {
-            resize: none; /* Отключение возможности растягивать поле содержания */
+            resize: none;
         }
         input[type="submit"] {
             padding: 10px;
@@ -87,6 +87,42 @@
         input[type="submit"]:hover {
             background-color: #666;
         }
+
+        .file-input-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+            margin-bottom: 10px;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            height: 100%;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            background-color: #222;
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+            box-sizing: border-box;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .file-input-label:hover {
+            background-color: #444;
+        }
+
+        input[type="file"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -96,7 +132,7 @@
     <a href="${pageContext.request.contextPath}/materials" class="back-button">Вернуться к материалам</a>
 </header>
 <main>
-    <form action="${pageContext.request.contextPath}/materials/update" method="post">
+    <form action="${pageContext.request.contextPath}/materials/update" method="post" enctype="multipart/form-data">
         <input type="hidden" name="materialId" value="${material.id}">
 
         <label for="title">Заголовок:</label>
@@ -105,11 +141,33 @@
         <label for="content">Содержание:</label>
         <textarea id="content" name="content" required>${material.content}</textarea>
 
-        <label for="imageUrl">URL изображения:</label>
-        <input type="text" id="imageUrl" name="imageUrl" value="${material.imageURL}">
+        <label for="file">Изображение:</label>
+                <div class="file-input-container">
+                    <label for="file" id="file-label" class="file-input-label">Выберите изображение</label>
+                    <input type="file" id="file" name="file" required>
+                </div>
 
         <input type="submit" value="Обновить материал">
     </form>
 </main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("file");
+    const fileLabel = document.getElementById("file-label");
+
+        if (fileInput && fileLabel) {
+            fileInput.addEventListener("change", function () {
+            if (fileInput.files.length > 0) {
+                const fileName = fileInput.files[0].name;
+                fileLabel.textContent = fileName;
+            } else {
+                fileLabel.textContent = "Выберите изображение";
+            }
+        });
+        } else {
+            console.error("Элементы fileInput или fileLabel не найдены!");
+    }
+});
+</script>
 </body>
 </html>

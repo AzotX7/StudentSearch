@@ -6,8 +6,8 @@
     <meta charset="UTF-8">
     <title>StudentSearch Materials</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
-        /* Общий стиль для страницы */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,7 +16,7 @@
             color: #fff;
         }
 
-        /* Верхняя навигация */
+
         header {
             background: #1a1a1a;
             color: #ffffff;
@@ -81,7 +81,6 @@
             cursor: pointer;
         }
 
-        /* Центральное название */
         .main-title {
             text-align: center;
             margin: 50px 0;
@@ -90,7 +89,7 @@
             color: #e0e0e0;
         }
 
-        /* Основная часть с карточками материалов */
+
         main {
             max-width: 1200px;
             margin: 20px auto;
@@ -131,7 +130,7 @@
             color: #ffffff;
         }
 
-        /* Стили для кнопок редактирования и удаления */
+
         .material-actions {
             margin-top: 15px;
             display: flex;
@@ -139,22 +138,22 @@
             gap: 10px;
         }
 
-        /* Общий стиль для кнопок */
+
         .btn {
-            padding: 10px 15px; /* Внутренние отступы */
-            border-radius: 5px; /* Закругление углов */
-            color: #fff; /* Цвет текста */
-            background-color: #444; /* Темный цвет фона */
-            font-size: 14px; /* Размер шрифта */
-            cursor: pointer; /* Указатель при наведении */
-            border: none; /* Убираем границу */
-            height: 40px; /* Фиксированная высота */
-            width: 120px; /* Фиксированная ширина */
-            display: flex; /* Используем flex для центрирования текста */
-            align-items: center; /* Вертикальное центрирование текста */
-            justify-content: center; /* Горизонтальное центрирование текста */
-            transition: background-color 0.3s; /* Плавный переход фона */
-            box-sizing: border-box; /* Включаем padding и border в общую высоту и ширину */
+            padding: 10px 15px;
+            border-radius: 5px;
+            color: #fff;
+            background-color: #444;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            height: 40px;
+            width: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+            box-sizing: border-box;
         }
 
         .btn:hover {
@@ -229,6 +228,22 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .favorite-star span {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .favorite-star span.filled {
+            color: yellow;
+        }
+
+        .material-card {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -251,6 +266,7 @@
             <a href="${pageContext.request.contextPath}/users" class="view-users-btn">Все пользователи</a>
         </c:if>
 
+        <a href="${pageContext.request.contextPath}/favorites">Избранное</a>
         <a href="${pageContext.request.contextPath}/materials/profile">Личный кабинет</a>
         <a href="${pageContext.request.contextPath}/logout">Выход</a>
     </nav>
@@ -264,13 +280,19 @@
             <c:forEach var="material" items="${materials}">
                 <div class="material-card">
                     <a href="${pageContext.request.contextPath}/materials/view?materialId=${material.id}">
-                        <img src="${material.imageURL}" alt="${material.title}">
+                        <img src="${pageContext.request.contextPath}/photo/${material.photoId}" alt="${material.title}">
                         <div class="material-content">
                             <h3>${material.title}</h3>
+                        </div>
+                    </a>
+                    <div class="favorite-star" data-material-id="${material.id}">
+                        <span>★</span>
+                    </div>
                             <c:if test="${user.role == 'ADMIN'}">
                                 <div class="material-actions">
                                     <a href="${pageContext.request.contextPath}/materials/edit?materialId=${material.id}" class="btn">Изменить</a>
                                     <form action="${pageContext.request.contextPath}/materials/${material.id}" method="post" class="delete-btn">
+                                        <input type="hidden" name="materialId" value="${material.id}">
                                         <input type="hidden" name="_method" value="delete">
                                         <button type="submit" class="btn" onclick="return confirm('Вы уверены, что хотите удалить этот материал?');">Удалить</button>
                                     </form>
@@ -303,6 +325,66 @@
 </div>
 
 <script>
+
+    function getCookie(name) {
+        const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]).split('|') : [];
+    }
+
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + days * 24 * 60 * 60);
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+    }
+
+    function updateFavoriteStar(materialId, isFavorite) {
+        const star = document.querySelector('.favorite-star[data-material-id="' + materialId + '"]');
+
+        if (star) {
+               if (isFavorite) {
+                   star.classList.add('filled');
+               } else {
+                   star.classList.remove('filled');
+               }
+
+           }
+        }
+
+
+    window.onload = function () {
+        const favoriteIds = getCookie('favorites');
+        favoriteIds.forEach(materialId => {
+            updateFavoriteStar(materialId, true);
+        });
+    };
+    document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.favorite-star').forEach(star => {
+        star.addEventListener('click', function () {
+            const materialId = this.getAttribute('data-material-id');
+
+            let favoriteIds = getCookie('favorites');
+            let isFavorite = favoriteIds.includes(materialId);
+
+            if (favoriteIds.includes(materialId)) {
+                favoriteIds = favoriteIds.filter(id => id !== materialId);
+                updateFavoriteStar(materialId, false);
+            } else {
+                favoriteIds.push(materialId);
+                updateFavoriteStar(materialId, true);
+            }
+
+            setCookie('favorites', favoriteIds.join('|'), 7);
+            updateFavoriteStar(materialId, !isFavorite);
+        });
+    });
+    });
+
+
+
     function openFilterModal() {
         document.getElementById('filterModal').style.display = 'block';
     }
@@ -320,3 +402,4 @@
 </script>
 </body>
 </html>
+

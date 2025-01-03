@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>${material.title}</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
 
         body {
@@ -50,7 +51,7 @@
             background-color: #666;
         }
 
-        /* Основная часть */
+
         main {
             max-width: 800px;
             margin: 40px auto;
@@ -75,7 +76,7 @@
             margin-bottom: 20px;
         }
 
-        /* Блок комментариев */
+
         .comments-section {
             margin-top: 30px;
         }
@@ -166,7 +167,7 @@
             background-color: #666;
         }
 
-        /* Блок кнопок для админа */
+
         .admin-actions {
             display: flex;
             justify-content: center;
@@ -174,7 +175,7 @@
             margin-top: 20px;
         }
 
-        /* Стиль кнопок "Изменить" и "Удалить" */
+
         .admin-actions .edit-btn,
         .admin-actions .delete-btn button {
             padding: 10px 15px;
@@ -227,7 +228,14 @@
 
 <main>
     <h1>${material.title}</h1>
-    <img src="${material.imageURL}" alt="${material.title}">
+
+    <c:if test="${material.photoId > 0}">
+        <img src="${pageContext.request.contextPath}/photo/${material.photoId}"
+             alt="${material.title}"
+             style="max-width: 100%; height: auto;">
+    </c:if>
+
+
     <p>${material.content}</p>
 
     <c:if test="${user.role == 'ADMIN'}">
@@ -242,7 +250,7 @@
 
     <div class="add-comment-form">
         <form action="${pageContext.request.contextPath}/comments" method="post">
-            <input type="hidden" name="materialId" value="${material.id}"> <!-- Передаем идентификатор материала -->
+            <input type="hidden" name="materialId" value="${material.id}">
             <textarea name="commentText" required placeholder="Ваш комментарий..."></textarea>
             <button type="submit">Добавить комментарий</button>
         </form>
@@ -257,14 +265,73 @@
                 <div class="comment-text">${comment.text}</div>
                 <c:if test="${user.role == 'ADMIN'}">
                     <form action="${pageContext.request.contextPath}/comments" method="post" class="delete-btn">
-                        <input type="hidden" name="action" value="deleteComment"> <!-- Действие удаления -->
-                        <input type="hidden" name="commentId" value="${comment.id}"> <!-- ID комментария -->
-                        <button type="submit" class="comment-delete-btn" onclick="return confirm('Вы уверены, что хотите удалить этот комментарий?');">Удалить</button>
+                        <input type="hidden" name="action" value="deleteComment">
+                        <input type="hidden" name="commentId" value="${comment.id}">
+                        <button type="submit" class="comment-delete-btn" onclick="return false;">Удалить</button>
                     </form>
                 </c:if>
             </div>
         </c:forEach>
     </div>
 </main>
+<script>
+$(document).ready(function () {
+
+    $('form[action="${pageContext.request.contextPath}/comments"]').submit(function (event) {
+        event.preventDefault();
+
+        const form = $(this);
+        const commentText = form.find('textarea[name="commentText"]').val();
+        const materialId = form.find('input[name="materialId"]').val();
+
+        if (!commentText.trim()) {
+            alert("Комментарий не может быть пустым");
+            return;
+        }
+
+        $.ajax({
+            url: form.attr('action'),
+            method: 'POST',
+            data: {
+                materialId: materialId,
+                commentText: commentText
+            },
+            success: function (response) {
+                const newComment = $(response);
+                $('.comments-section').append(newComment);
+                form.find('textarea').val('');
+            },
+            error: function () {
+                alert('Ошибка при добавлении комментария');
+            }
+        });
+    });
+
+    $('.comments-section').on('click', '.comment-delete-btn', function (event) {
+        event.preventDefault();
+
+        const button = $(this);
+        const commentId = button.closest('form').find('input[name="commentId"]').val();
+
+        if (confirm('Вы уверены, что хотите удалить этот комментарий?')) {
+            $.ajax({
+                url: button.closest('form').attr('action'),
+                method: 'POST',
+                data: {
+                    action: 'deleteComment',
+                    commentId: commentId
+                },
+                success: function () {
+                    button.closest('.comment').remove();
+                },
+                error: function () {
+                    alert('Ошибка при удалении комментария');
+                }
+            });
+        }
+    });
+
+});
+</script>
 </body>
 </html>
