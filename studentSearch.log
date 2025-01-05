@@ -1322,3 +1322,15 @@ INFO: Приложение studentSearch завершено.
 INFO: Приложение studentSearch запущено.
 дек 28, 2024 5:24:42 PM com.azot.course.listener.AppContextListener contextDestroyed
 INFO: Приложение studentSearch завершено.
+янв 05, 2025 6:50:50 PM com.azot.course.listener.AppContextListener contextInitialized
+INFO: Приложение studentSearch запущено.
+янв 05, 2025 6:51:03 PM com.azot.course.listener.AppContextListener contextDestroyed
+INFO: Приложение studentSearch завершено.
+янв 05, 2025 7:01:16 PM com.azot.course.listener.AppContextListener contextInitialized
+INFO: Приложение studentSearch запущено.
+янв 05, 2025 7:02:45 PM com.azot.course.listener.AppContextListener contextDestroyed
+INFO: Приложение studentSearch завершено.
+янв 05, 2025 7:09:46 PM com.azot.course.listener.AppContextListener contextInitialized
+INFO: Приложение studentSearch запущено.
+янв 05, 2025 7:12:19 PM com.azot.course.listener.AppContextListener contextDestroyed
+INFO: Приложение studentSearch завершено.

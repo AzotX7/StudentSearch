@@ -1,8 +1,9 @@
 package com.azot.course.servlets;
 
 import com.azot.course.DTO.UserDTO;
-import com.azot.course.user.Role;
 import com.azot.course.service.UserService;
+import com.azot.course.user.Role;
+import com.azot.course.service.serviceImpl.UserServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.annotation.WebServlet;
@@ -32,7 +33,7 @@ public class UserServlet extends HttpServlet {
 
 
     public UserServlet() throws SQLException {
-        this.userService = new UserService(Database.getConnection());
+        this.userService = new UserServiceImpl(Database.getConnection());
     }
 
     @Override

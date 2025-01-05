@@ -3,6 +3,7 @@ package com.azot.course.servlets;
 
 import com.azot.course.DTO.MaterialDTO;
 import com.azot.course.service.MaterialService;
+import com.azot.course.service.serviceImpl.MaterialServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.ServletException;
@@ -26,7 +27,7 @@ public class FavoritesServlet extends HttpServlet {
     private static final String REMOVE_FAVORITE = "remove";
 
     public FavoritesServlet() throws SQLException {
-        this.materialService = new MaterialService(Database.getConnection());
+        this.materialService = new MaterialServiceImpl(Database.getConnection());
     }
 
 

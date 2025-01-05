@@ -2,6 +2,7 @@ package com.azot.course.servlets;
 
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.service.UserService;
+import com.azot.course.service.serviceImpl.UserServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.ServletException;
@@ -19,7 +20,7 @@ public class SearchUsersServlet extends HttpServlet {
     private final UserService userService;
 
     public SearchUsersServlet() throws SQLException{
-        this.userService = new UserService(Database.getConnection());
+        this.userService = new UserServiceImpl(Database.getConnection());
     }
 
     @Override

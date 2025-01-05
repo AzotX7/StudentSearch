@@ -2,6 +2,7 @@ package com.azot.course.servlets;
 
 import com.azot.course.models.Image;
 import com.azot.course.service.ImageService;
+import com.azot.course.service.serviceImpl.ImageServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.annotation.WebServlet;
@@ -17,7 +18,7 @@ public class PhotoServlet extends HttpServlet {
     private final ImageService photoService;
 
     public PhotoServlet() throws Exception {
-        this.photoService = new ImageService(Database.getConnection());
+        this.photoService = new ImageServiceImpl(Database.getConnection());
     }
 
     @Override

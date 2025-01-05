@@ -1,8 +1,9 @@
 package com.azot.course.servlets;
 
+import com.azot.course.service.UserService;
 import com.azot.course.user.Role;
 
-import com.azot.course.service.UserService;
+import com.azot.course.service.serviceImpl.UserServiceImpl;
 import com.azot.course.database.Database;
 import com.azot.course.util.Validator;
 
@@ -21,7 +22,7 @@ public class AuthServlet extends HttpServlet {
     private final UserService userService;
 
     public AuthServlet() throws SQLException {
-        this.userService = new UserService(Database.getConnection());
+        this.userService = new UserServiceImpl(Database.getConnection());
     }
 
 

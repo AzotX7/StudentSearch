@@ -3,6 +3,7 @@ package com.azot.course.servlets;
 import com.azot.course.DTO.CommentDTO;
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.service.CommentService;
+import com.azot.course.service.serviceImpl.CommentServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +22,7 @@ public class CommentServlet extends HttpServlet {
     private final CommentService commentService;
 
     public CommentServlet() throws SQLException {
-        this.commentService = new CommentService(Database.getConnection());
+        this.commentService = new CommentServiceImpl(Database.getConnection());
     }
 
     @Override
