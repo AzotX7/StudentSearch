@@ -3,6 +3,7 @@ package com.azot.course.servlets;
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.models.User;
 import com.azot.course.service.UserService;
+import com.azot.course.service.serviceImpl.UserServiceImpl;
 import com.azot.course.database.Database;
 
 
@@ -20,7 +21,7 @@ public class LoginServlet extends HttpServlet {
     private final UserService userService;
 
     public LoginServlet() throws SQLException {
-        this.userService = new UserService(Database.getConnection());
+        this.userService = new UserServiceImpl(Database.getConnection());
     }
 
 

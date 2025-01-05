@@ -7,7 +7,10 @@ import com.azot.course.DTO.UserDTO;
 import com.azot.course.models.User;
 import com.azot.course.service.MaterialService;
 import com.azot.course.service.UserService;
+import com.azot.course.service.serviceImpl.MaterialServiceImpl;
+import com.azot.course.service.serviceImpl.UserServiceImpl;
 import com.azot.course.database.Database;
+import com.azot.course.util.Validator;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,8 +28,8 @@ public class ProfileServlet extends HttpServlet {
     private final MaterialService materialService;
 
     public ProfileServlet() throws SQLException {
-        this.userService = new UserService(Database.getConnection());
-        this.materialService = new MaterialService(Database.getConnection());
+        this.userService = new UserServiceImpl(Database.getConnection());
+        this.materialService = new MaterialServiceImpl(Database.getConnection());
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -72,7 +75,7 @@ public class ProfileServlet extends HttpServlet {
             String email = request.getParameter("email");
 
 
-            if (isValidProfileData(username, email)) {
+            if (Validator.isValidEmail(email) && Validator.isValidUsername(username)) {
                 try {
                     updateUserProfile(request, response, userDTO, username, email);
                 } catch (SQLException e) {
@@ -80,7 +83,7 @@ public class ProfileServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
                 }
             } else {
-                request.setAttribute("errorMessage", "Имя пользователя и email не могут быть пустыми.");
+                request.setAttribute("errorMessage", "Имя пользователя и email неккоректны");
                 request.getRequestDispatcher("/WEB-INF/views/error.jsp").forward(request, response);
             }
         }
@@ -132,9 +135,5 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("user", userDTO);
         request.getRequestDispatcher("/WEB-INF/views/editProfile.jsp").forward(request, response);
-    }
-
-    private boolean isValidProfileData(String username, String email) {
-        return username != null && !username.trim().isEmpty() && email != null && !email.trim().isEmpty();
     }
 }

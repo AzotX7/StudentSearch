@@ -2,6 +2,7 @@ package com.azot.course.servlets;
 
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.service.CategoryService;
+import com.azot.course.service.serviceImpl.CategoryServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.ServletException;
@@ -22,7 +23,7 @@ public class CategoryServlet extends HttpServlet {
 
 
     public CategoryServlet() throws SQLException {
-        this.categoryService = new CategoryService(Database.getConnection());
+        this.categoryService = new CategoryServiceImpl(Database.getConnection());
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.azot.course.DTO.MaterialDTO;
 import com.azot.course.models.Category;
 import com.azot.course.service.CategoryService;
 import com.azot.course.service.MaterialService;
+import com.azot.course.service.serviceImpl.CategoryServiceImpl;
+import com.azot.course.service.serviceImpl.MaterialServiceImpl;
 import com.azot.course.database.Database;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -23,8 +25,8 @@ public class SearchMaterialsServlet extends HttpServlet {
     private final MaterialService materialService;
 
     public SearchMaterialsServlet() throws SQLException {
-        this.categoryService = new CategoryService(Database.getConnection());
-        this.materialService = new MaterialService(Database.getConnection());
+        this.categoryService = new CategoryServiceImpl(Database.getConnection());
+        this.materialService = new MaterialServiceImpl(Database.getConnection());
     }
 
     @Override

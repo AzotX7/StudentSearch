@@ -7,10 +7,14 @@ import com.azot.course.DTO.UserDTO;
 import com.azot.course.models.Category;
 import com.azot.course.models.Image;
 import com.azot.course.service.CategoryService;
-import com.azot.course.service.ImageService;
-import com.azot.course.user.Role;
 import com.azot.course.service.CommentService;
+import com.azot.course.service.ImageService;
 import com.azot.course.service.MaterialService;
+import com.azot.course.service.serviceImpl.CategoryServiceImpl;
+import com.azot.course.service.serviceImpl.ImageServiceImpl;
+import com.azot.course.user.Role;
+import com.azot.course.service.serviceImpl.CommentServiceImpl;
+import com.azot.course.service.serviceImpl.MaterialServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.annotation.MultipartConfig;
@@ -53,10 +57,10 @@ public class MaterialServlet extends HttpServlet {
 
 
     public MaterialServlet() throws SQLException {
-        this.materialService = new MaterialService(Database.getConnection());
-        this.commentService = new CommentService(Database.getConnection());
-        this.categoryService = new CategoryService(Database.getConnection());
-        this.photoService = new ImageService(Database.getConnection());
+        this.materialService = new MaterialServiceImpl(Database.getConnection());
+        this.commentService = new CommentServiceImpl(Database.getConnection());
+        this.categoryService = new CategoryServiceImpl(Database.getConnection());
+        this.photoService = new ImageServiceImpl(Database.getConnection());
     }
 
     @Override

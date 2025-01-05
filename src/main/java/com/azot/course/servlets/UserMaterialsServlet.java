@@ -4,6 +4,7 @@ package com.azot.course.servlets;
 import com.azot.course.DTO.MaterialDTO;
 import com.azot.course.DTO.UserDTO;
 import com.azot.course.service.MaterialService;
+import com.azot.course.service.serviceImpl.MaterialServiceImpl;
 import com.azot.course.database.Database;
 
 import javax.servlet.ServletException;
@@ -21,7 +22,7 @@ public class UserMaterialsServlet extends HttpServlet {
     private final MaterialService materialService;
 
     public UserMaterialsServlet() throws SQLException {
-        this.materialService = new MaterialService(Database.getConnection());
+        this.materialService = new MaterialServiceImpl(Database.getConnection());
     }
 
     @Override
